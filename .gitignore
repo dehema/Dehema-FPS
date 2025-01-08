@@ -1,0 +1,10 @@
+﻿Library
+*.vsconfig
+*.csproj
+Logs
+Unity-Frame.sln
+Packages
+Assets/StreamingAssets/build_info
+Temp
+obj
+.vs
