@@ -16,6 +16,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
     public AllCityConfig allCityConfig;
     public WorldConfig worldConfig;
     public AllFactionConfig factionConfig;
+    public GunConfig gunConfig;
 
     public void Init()
     {
@@ -29,6 +30,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
         allCityConfig = LoadConfig<AllCityConfig>("City");
         worldConfig = LoadConfig<WorldConfig>("World");
         factionConfig = LoadConfig<AllFactionConfig>("Faction");
+        gunConfig = LoadConfig<GunConfig>("Gun");
         AllLoadComplete();
     }
 
@@ -46,16 +48,9 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
     /// <returns></returns>
     private T LoadConfig<T>(string key, string _config = "")
     {
-        if (string.IsNullOrEmpty(_config))
-        {
-            string filePath = configPath + key;
-            _config = Resources.Load<TextAsset>(filePath).text;
-            Debug.Log("读取到配置文件" + filePath + "\n" + _config);
-        }
-        else
-        {
-            Debug.Log("读取到远端配置" + typeof(T).ToString() + "\n" + _config);
-        }
+        string filePath = configPath + key;
+        _config = Resources.Load<TextAsset>(filePath).text;
+        Debug.Log("读取到配置文件" + filePath + "\n" + _config);
         T t = JsonConvert.DeserializeObject<T>(_config);
         ConfigBase configBase = t as ConfigBase;
         configBase.Init();

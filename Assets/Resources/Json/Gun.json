@@ -1,0 +1,19 @@
+{
+  "guns": {
+    "M870": {
+      "weaponName": "M870",
+      "projectilePrefab": "Projectile_Shotgun",
+      "shootingMode": 0,
+      "delayBetweenShots": 0.2,
+      "bulletSpreadAngle": 24,
+      "bulletsPerShot": 8,
+      "damagePerBullet": 8,
+      "recoilForce": 1,
+      "aimZoomRatio": 0.7,
+      "ammoReloadRate": 1,
+      "ammoReloadDelay": 1,
+      "maxAmmo": 2
+    }
+  },
+  "other": {}
+}
