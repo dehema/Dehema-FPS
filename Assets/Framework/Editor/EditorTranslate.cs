@@ -1,5 +1,4 @@
-﻿using Codice.Utils;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -111,7 +110,7 @@ public class EditorTranslate : MonoBehaviour
         string secretKey = "CLJf59XylJlwYqwE35TW";
         string sign = EncryptString(appId + q + salt + secretKey);
         string url = "http://api.fanyi.baidu.com/api/trans/vip/translate?";
-        url += "q=" + HttpUtility.UrlEncode(q);
+        //url += "q=" + HttpUtility.UrlEncode(q);
         url += "&from=" + from;
         url += "&to=" + to;
         url += "&appid=" + appId;
