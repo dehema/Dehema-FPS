@@ -22,26 +22,20 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+    }
+
+    public void InitWeapon()
+    {
+        if (ConfigMgr.Ins.gunConfig.isLoaded && ConfigMgr.Ins.gunConfig.guns.Count > 0)
+            EquipWeapon(ConfigMgr.Ins.gunConfig.guns.First().Value);
+    }
+
+    public void EquipWeapon(GunItemConfig _gunConfig)
+    {
+        if (weaponInstance != null)
         {
-            if (UIMgr.Ins.IsShow<GameDebugView>())
-            {
-                UIMgr.Ins.CloseView<GameDebugView>();
-            }
-            else
-            {
-                UIMgr.Ins.OpenView<GameDebugView>();
-            }
+            Destroy(weaponInstance.gameObject);
         }
-    }
-
-    void InitWeapon()
-    {
-        EquipWeapon(ConfigMgr.Ins.gunConfig.guns.First().Value);
-    }
-
-    void EquipWeapon(GunItemConfig _gunConfig)
-    {
         weaponInstance = Instantiate(WeaponMgr.Ins.GetWeaponPrefab(_gunConfig.weaponName), transWeaponParentSocket).GetComponent<WeaponController>();
         weaponInstance.transform.localPosition = Vector3.zero;
         weaponInstance.transform.localRotation = Quaternion.identity;
@@ -49,6 +43,6 @@ public class PlayerController : MonoBehaviour
         // Set owner to this gameObject so the weapon can alter projectile/damage logic accordingly
         weaponInstance.Owner = gameObject;
         weaponInstance.SourcePrefab = weaponInstance.gameObject;
-        weaponInstance.ShowWeapon(false);
+        weaponInstance.ShowWeapon(true);
     }
 }
