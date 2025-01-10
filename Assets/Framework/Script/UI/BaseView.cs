@@ -24,7 +24,7 @@ public class BaseView : BaseUI, IBaseView
         _viewName = GetType().ToString();
         Utility.Log(_viewName + ".Init()", gameObject);
         //canvas
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.worldCamera = Camera.main;
         //CanvasScaler
         CanvasScaler canvasScaler = GetComponent<CanvasScaler>();

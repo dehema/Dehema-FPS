@@ -15,6 +15,10 @@ public partial class GameDebugView : BaseView
     public GameObject content;
     [HideInInspector]
     public RectTransform content_Rect;
+    [HideInInspector]
+    public GameObject gunItem;
+    [HideInInspector]
+    public Toggle gunItem_Toggle;
 
     internal override void _LoadUI()    
     {
@@ -24,5 +28,7 @@ public partial class GameDebugView : BaseView
         bg_Button = bg.GetComponent<Button>();
         content = transform.Find("$content#Rect").gameObject;
         content_Rect = content.GetComponent<RectTransform>();
+        gunItem = transform.Find("$content#Rect/guns/hor/$gunItem#Toggle").gameObject;
+        gunItem_Toggle = gunItem.GetComponent<Toggle>();
     }
 }

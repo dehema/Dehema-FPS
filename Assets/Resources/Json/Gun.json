@@ -1,5 +1,61 @@
 {
   "guns": {
+    "AK12": {
+      "weaponName": "AK12",
+      "projectilePrefab": "Projectile_Shotgun",
+      "shootingMode": 0,
+      "delayBetweenShots": 0.2,
+      "bulletSpreadAngle": 24,
+      "bulletsPerShot": 8,
+      "damagePerBullet": 8,
+      "recoilForce": 1,
+      "aimZoomRatio": 0.7,
+      "ammoReloadRate": 1,
+      "ammoReloadDelay": 1,
+      "maxAmmo": 2
+    },
+    "M4A1": {
+      "weaponName": "M4A1",
+      "projectilePrefab": "Projectile_Shotgun",
+      "shootingMode": 0,
+      "delayBetweenShots": 0.2,
+      "bulletSpreadAngle": 24,
+      "bulletsPerShot": 8,
+      "damagePerBullet": 8,
+      "recoilForce": 1,
+      "aimZoomRatio": 0.7,
+      "ammoReloadRate": 1,
+      "ammoReloadDelay": 1,
+      "maxAmmo": 2
+    },
+    "Scar": {
+      "weaponName": "Scar",
+      "projectilePrefab": "Projectile_Shotgun",
+      "shootingMode": 0,
+      "delayBetweenShots": 0.2,
+      "bulletSpreadAngle": 24,
+      "bulletsPerShot": 8,
+      "damagePerBullet": 8,
+      "recoilForce": 1,
+      "aimZoomRatio": 0.7,
+      "ammoReloadRate": 1,
+      "ammoReloadDelay": 1,
+      "maxAmmo": 2
+    },
+    "SG552": {
+      "weaponName": "SG552",
+      "projectilePrefab": "Projectile_Shotgun",
+      "shootingMode": 0,
+      "delayBetweenShots": 0.2,
+      "bulletSpreadAngle": 24,
+      "bulletsPerShot": 8,
+      "damagePerBullet": 8,
+      "recoilForce": 1,
+      "aimZoomRatio": 0.7,
+      "ammoReloadRate": 1,
+      "ammoReloadDelay": 1,
+      "maxAmmo": 2
+    },
     "M870": {
       "weaponName": "M870",
       "projectilePrefab": "Projectile_Shotgun",

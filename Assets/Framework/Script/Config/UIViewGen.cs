@@ -1,4 +1,4 @@
-﻿public enum ViewLayer
+public enum ViewLayer
 { 
 	//普通UI
 	NormalUI = 0,
@@ -32,4 +32,7 @@ public class ViewName
 	public const string EscView = "EscView";
 	public const string SettingView = "SettingView";
 	public const string CityInfoView = "CityInfoView";
+	public const string BattleVictoryView = "BattleVictoryView";
+	public const string BattleDefeatView = "BattleDefeatView";
+	public const string GameDebugView = "GameDebugView";
 }

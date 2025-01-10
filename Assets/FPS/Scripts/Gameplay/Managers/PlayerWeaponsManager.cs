@@ -111,10 +111,10 @@ namespace Unity.FPS.Gameplay
             OnSwitchedToWeapon += OnWeaponSwitched;
 
             // Add starting weapons
-            foreach (var weapon in StartingWeapons)
-            {
-                AddWeapon(weapon);
-            }
+            //foreach (var weapon in StartingWeapons)
+            //{
+            //    AddWeapon(weapon);
+            //}
 
             SwitchWeapon(true);
         }
