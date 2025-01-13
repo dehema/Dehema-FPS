@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 public partial class GameDebugView : BaseView
 {
-    PlayerController playerController;
+    PlayerCtl playerController;
     List<Toggle> tgWeaponList = new List<Toggle>();
 
     public override void Init(params object[] _params)
     {
         base.Init(_params);
-        playerController = FindFirstObjectByType<PlayerController>();
+        playerController = FindFirstObjectByType<PlayerCtl>();
 
         initGuns();
     }
@@ -21,7 +21,7 @@ public partial class GameDebugView : BaseView
     void initGuns()
     {
         gunItem.SetActive(false);
-        foreach (var _config in ConfigMgr.Ins.gunConfig.guns)
+        foreach (var _config in ConfigMgr.Ins.weaponConfig.guns)
         {
             GameObject item = Instantiate(gunItem, gunItem.transform.parent);
             item.SetActive(true);

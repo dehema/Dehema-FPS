@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8247119159547539584}
-  - component: {fileID: 5406681055662326573}
   - component: {fileID: 6319634147951591808}
+  - component: {fileID: -5290549815415619824}
   m_Layer: 10
   m_Name: Weapon_Shotgun_M870
   m_TagString: Untagged
@@ -35,61 +35,6 @@ Transform:
   - {fileID: 1994297903325923116}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5406681055662326573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 558232941404075086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ad90ba0b1477764da373f5ec01a8cb5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WeaponName: Shotgun
-  WeaponIcon: {fileID: 21300000, guid: 8cbb10368086f014a8b7fc8932e7f436, type: 3}
-  CrosshairDataDefault:
-    CrosshairSprite: {fileID: 21300000, guid: 2962952d6e5ae7342a298d45a3945069, type: 3}
-    CrosshairSize: 40
-    CrosshairColor: {r: 0.4292453, g: 0.8855148, b: 1, a: 0.41960785}
-  CrosshairDataTargetInSight:
-    CrosshairSprite: {fileID: 21300000, guid: 2962952d6e5ae7342a298d45a3945069, type: 3}
-    CrosshairSize: 30
-    CrosshairColor: {r: 0, g: 0.64177275, b: 1, a: 1}
-  WeaponRoot: {fileID: 6560353189966553360}
-  WeaponMuzzle: {fileID: 1994297903325923116}
-  ShootType: 0
-  ProjectilePrefab: {fileID: 8924682559891268397, guid: f05c7e6fbbfbe824388456bb4abff9d4, type: 3}
-  DelayBetweenShots: 0.2
-  BulletSpreadAngle: 7
-  BulletsPerShot: 24
-  RecoilForce: 2
-  AimZoomRatio: 0.7
-  AimOffset: {x: 0, y: 0.13, z: 0}
-  AutomaticReload: 1
-  HasPhysicalBullets: 0
-  ClipSize: 30
-  ShellCasing: {fileID: 0}
-  EjectionPort: {fileID: 0}
-  ShellCasingEjectionForce: 2
-  ShellPoolSize: 1
-  AmmoReloadRate: 1.1
-  AmmoReloadDelay: 1
-  MaxAmmo: 2
-  AutomaticReleaseOnCharged: 0
-  MaxChargeDuration: 1
-  AmmoUsedOnStartCharge: 0
-  AmmoUsageRateWhileCharging: 1
-  WeaponAnimator: {fileID: 0}
-  MuzzleFlashPrefab: {fileID: 748781637555137343, guid: 4f5d4e5eaa0e5104791549cea3dc3f23, type: 3}
-  UnparentMuzzleFlash: 0
-  ShootSfx: {fileID: 8300000, guid: be87267ec54c5264daffd2ffeb91d6a7, type: 3}
-  ChangeWeaponSfx: {fileID: 8300000, guid: 7b83d61917ac1224f942a0609b1221f2, type: 3}
-  UseContinuousShootSound: 0
-  ContinuousShootStartSfx: {fileID: 0}
-  ContinuousShootLoopSfx: {fileID: 0}
-  ContinuousShootEndSfx: {fileID: 0}
 --- !u!82 &6319634147951591808
 AudioSource:
   m_ObjectHideFlags: 0
@@ -187,6 +132,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-5290549815415619824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 558232941404075086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b0e0571d349a944ba4cb2e0d865630c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponRoot: {fileID: 0}
 --- !u!1 &3060357242545794678
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +156,7 @@ GameObject:
   - component: {fileID: 7685450920542924541}
   - component: {fileID: 8586977423324618037}
   - component: {fileID: 2932994234551491162}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Stock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -237,7 +195,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3060357242545794678}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -284,7 +242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1994297903325923116}
   m_Layer: 10
-  m_Name: GunMuzzle
+  m_Name: BulletRoot
   m_TagString: Untagged
   m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -316,7 +274,7 @@ GameObject:
   - component: {fileID: 8555220749879494781}
   - component: {fileID: 6133266547913295587}
   - component: {fileID: 3047376741060185492}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -354,7 +312,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3555021334671711458}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -402,7 +360,7 @@ GameObject:
   - component: {fileID: 8559003076784707072}
   - component: {fileID: 2180426458642424860}
   - component: {fileID: 382016655082057440}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_BarrelGuard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -440,7 +398,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3704594549436810606}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -488,7 +446,7 @@ GameObject:
   - component: {fileID: 2184671551341274091}
   - component: {fileID: 6674574662677940379}
   - component: {fileID: 4748907012791755880}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Receiver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -526,7 +484,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4144336235726957406}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -574,7 +532,7 @@ GameObject:
   - component: {fileID: 1349860708540384169}
   - component: {fileID: 9045103712675362258}
   - component: {fileID: 1817764072201053583}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -612,7 +570,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4389787286236959471}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -660,7 +618,7 @@ GameObject:
   - component: {fileID: 7663882323648672283}
   - component: {fileID: 1008849632830350784}
   - component: {fileID: 7704941455604854146}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_BarrelGuard_Part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -698,7 +656,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4454023434169123670}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -746,7 +704,7 @@ GameObject:
   - component: {fileID: 4867218831317665934}
   - component: {fileID: 5904187468513179489}
   - component: {fileID: 1274938021282679712}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -784,7 +742,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5961042383650596434}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -832,7 +790,7 @@ GameObject:
   - component: {fileID: 8037082037139295651}
   - component: {fileID: 3144874496471326522}
   - component: {fileID: 2155683658381914518}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -870,7 +828,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6370252914101129502}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -918,7 +876,7 @@ GameObject:
   - component: {fileID: 5967794866840578778}
   - component: {fileID: 5111997068746687370}
   - component: {fileID: 225033647476451371}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Stock_Part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -956,7 +914,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6458933889692363154}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -1003,7 +961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1781788412254778568}
   m_Layer: 10
-  m_Name: GunRoot
+  m_Name: WeaponRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1034,7 +992,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1119294344806158667}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1076,7 +1034,7 @@ GameObject:
   - component: {fileID: 2992080414741743559}
   - component: {fileID: 563826168164830481}
   - component: {fileID: 4439727387504854786}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ShotGun_F_Bolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1114,7 +1072,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7184952761823359275}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0

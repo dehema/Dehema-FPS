@@ -1,8 +1,25 @@
 using UnityEngine;
 
-public class WeaponMgr : Singleton<WeaponMgr>
+public class WeaponMgr : MonoSingleton<WeaponMgr>
 {
     const string weaponSpritePath = "Sprite/Weapon/";
+    WeaponCtl activeWeapon;
+
+    void Update()
+    {
+
+        //bool hasFired = activeWeapon.HandleShootInputs(
+        //    m_InputHandler.GetFireInputDown(),
+        //    m_InputHandler.GetFireInputHeld(),
+        //    m_InputHandler.GetFireInputReleased());
+
+        //// Handle accumulating recoil
+        //if (hasFired)
+        //{
+        //    m_AccumulatedRecoil += Vector3.back * activeWeapon.RecoilForce;
+        //    m_AccumulatedRecoil = Vector3.ClampMagnitude(m_AccumulatedRecoil, MaxRecoilDistance);
+        //}
+    }
 
     //ªÒ»°Œ‰∆˜Õº±Í
     public Sprite GetWeaponIcon(string _weaponName)

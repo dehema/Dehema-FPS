@@ -16,7 +16,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
     public AllCityConfig allCityConfig;
     public WorldConfig worldConfig;
     public AllFactionConfig factionConfig;
-    public GunConfig gunConfig;
+    public WeaponConfig weaponConfig;
 
     public void Init()
     {
@@ -30,7 +30,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
         allCityConfig = LoadConfig<AllCityConfig>("City");
         worldConfig = LoadConfig<WorldConfig>("World");
         factionConfig = LoadConfig<AllFactionConfig>("Faction");
-        gunConfig = LoadConfig<GunConfig>("Gun");
+        weaponConfig = LoadConfig<WeaponConfig>("Weapon");
         AllLoadComplete();
     }
 
