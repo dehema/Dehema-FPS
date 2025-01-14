@@ -1,7 +1,7 @@
-using UnityEngine;
+锘縰sing UnityEngine;
 
 public class InGameMgr : MonoSingleton<InGameMgr>
 {
     
-    public bool isGameEnding;  //游戏是否结束
+    public bool isGameEnding;  //娓告垙鏄惁缁撴潫
 }

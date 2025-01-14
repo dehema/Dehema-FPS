@@ -1,4 +1,4 @@
-using Unity.FPS.Game;
+ï»¿using Unity.FPS.Game;
 using UnityEngine;
 
 public class WeaponCtl : MonoBehaviour
@@ -9,15 +9,15 @@ public class WeaponCtl : MonoBehaviour
         Automatic,
         Charge,
     }
-    GunItemConfig weaponConfig;         //ÎäÆ÷ÅäÖÃ
-    Transform weaponRoot;               //ÎäÆ÷½Úµã
-    Transform bulletRoot;               //×Óµ¯Ä£ĞÍ
-    GameObject bulletPrefab;            //×Óµ¯Ä£ĞÍ
-    GameObject mainWeapon;              //Ö÷ÎäÆ÷   
-    bool _wantsToShoot = false;         //ÊÇ·ñÒª½øĞĞÉä»÷
-    WeaponShootType _weaponShootType;   //Éä»÷Ä£Ê½
-    float currentAmmo;                  //µ±Ç°µ¯Ò©Á¿
-    float lastTimeShot;                 //ÉÏ´ÎÉä»÷Ê±¼ä
+    GunItemConfig weaponConfig;         //æ­¦å™¨é…ç½®
+    Transform weaponRoot;               //æ­¦å™¨èŠ‚ç‚¹
+    Transform bulletRoot;               //å­å¼¹æ¨¡å‹
+    GameObject bulletPrefab;            //å­å¼¹æ¨¡å‹
+    GameObject mainWeapon;              //ä¸»æ­¦å™¨   
+    bool _wantsToShoot = false;         //æ˜¯å¦è¦è¿›è¡Œå°„å‡»
+    WeaponShootType _weaponShootType;   //å°„å‡»æ¨¡å¼
+    float currentAmmo;                  //å½“å‰å¼¹è¯é‡
+    float lastTimeShot;                 //ä¸Šæ¬¡å°„å‡»æ—¶é—´
 
 
     void Awake()

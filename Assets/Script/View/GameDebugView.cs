@@ -1,4 +1,4 @@
-using Framework.Example;
+﻿using Framework.Example;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.FPS.Game;

@@ -4,6 +4,7 @@ public class WeaponMgr : MonoSingleton<WeaponMgr>
 {
     const string weaponSpritePath = "Sprite/Weapon/";
     WeaponCtl activeWeapon;
+    public bool isAiming = false;
 
     void Update()
     {
