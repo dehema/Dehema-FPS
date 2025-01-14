@@ -42,6 +42,16 @@ public class PlayerInput : MonoBehaviour
         return false;
     }
 
+    public bool GetSprintInputHeld()
+    {
+        if (CanProcessInput())
+        {
+            return Input.GetButton(GameConstants.k_ButtonNameSprint);
+        }
+
+        return false;
+    }
+
     public float GetLookInputsHorizontal()
     {
         return GetMouseOrStickLookAxis(GameConstants.k_MouseAxisNameHorizontal,

@@ -13,6 +13,7 @@ public class PlayerCtl : MonoBehaviour
     [Header("脚步音频")] public AudioClip FootstepSfx;
     [Header("跳跃音频")] public AudioClip jumpSfx;
     [Header("落地音频")] public AudioClip landSfx;
+    [Header("落地受伤音频")] public AudioClip fallDamageSfx;
     [Header("移动速度")] public float maxSpeedOnGround = 10f;
     [Header("冲刺速度系数")] public float runSpeedModifier = 2f;
     [Header("移动清晰度")] public float MovementSharpnessOnGround = 15;
@@ -21,10 +22,19 @@ public class PlayerCtl : MonoBehaviour
     [Header("空中最大速度")] public float maxSpeedInAir = 10f;
     [Header("站立时的高度")] public float capsuleHeightStanding = 1.8f;
     [Header("蹲着时的高度")] public float capsuleHeightCrouching = 0.9f;
+    [Tooltip("蹲下转换的速度")] public float crouchingSharpness = 10f;
+    [Tooltip("蹲着时的移动速度")][Range(0, 1)] public float maxSpeedCrouchedRatio = 0.5f;
     [Header("地面检测距离")] public float groundCheckDistance = 0.05f;
     [Header("检测地面的层数")] public LayerMask groundCheckLayers = -1;
     [Header("奔跑时声音频率")] public float footstepSfxFrequencyWhileSprinting = 1f;
-    [Header("移动时声音频率")] public float FootstepSfxFrequency = 1f;
+    [Header("移动时声音频率")] public float footstepSfxFrequency = 1f;
+    [Header("掉落受伤最大速度")] public float minSpeedForFallDamage = 10f;
+    [Header("掉落受伤最大速度")] public float maxSpeedForFallDamage = 30f;
+    [Header("掉落最小伤害")] public float fallDamageAtMinSpeed = 10F;
+    [Header("掉落最大伤害")] public float fallDamageAtMaxSpeed = 50f;
+    [Header("玩家是否会承受掉落伤害")] public bool RecievesFallDamage;
+    [Header("Stance")]
+    [Tooltip("摄像机所在的字符高度的比率（0-1）")] public float cameraHeightRatio = 0.9f;
     CharacterController characterController;        //角色控制器
     Camera playerCamera;
     PlayerWeaponsManager weaponsManager;
@@ -34,15 +44,18 @@ public class PlayerCtl : MonoBehaviour
     WeaponCtl currWeaponCtl;                        //当前装备的武器
     PlayerInput playerInput;                        //按键输入
     public bool isGrounded { get; private set; }    //是否在地面上
+    public bool HasJumpedThisFrame { get; private set; }
+    public bool isCrouching { get; private set; }
     public Vector3 characterVelocity { get; set; }  //角色速度
     public float rotationMultiplier { get { if (WeaponMgr.Ins.isAiming) { return 1f; } return 1f; } }//旋转系数
-    float targetCharacterHeight;                    //角色高度
+    float _targetCharacterHeight;                    //角色高度
     float _cameraVerticalAngle = 0;                 //相机垂直角度
     float lastTimeJumped = 0;                       //上次跳跃时间
     const float k_JumpGroundingPreventionTime = 0.2f;//跳跃后防止立即检测地面的时间
     const float k_GroundCheckDistanceInAir = 0.07f; //空中地面检测距离
     Vector3 _groundNormal;                          //地面法线
     float footstepDistanceCounter;                  //移动距离
+    Vector3 latestImpactSpeed;
 
     void Start()
     {
@@ -60,19 +73,50 @@ public class PlayerCtl : MonoBehaviour
 
         characterController.enableOverlapRecovery = true;
         SetCrouchingState(false, true);
+        UpdateCharacterHeight(true);
     }
 
+    /// <summary>
+    /// 每帧更新角色状态
+    /// </summary>
     void Update()
     {
-        bool wasGrounded = isGrounded;
-        GroundCheck();
-        CharacterMovement();
+        // 重置跳跃状态标记
+        HasJumpedThisFrame = false;
 
-        // 处理落地事件
-        if (!wasGrounded && isGrounded)
+        // 保存上一帧的地面状态，用于检测状态变化
+        bool wasGrounded = isGrounded;
+        // 进行地面检测
+        GroundCheck();
+
+        // 处理落地逻辑
+        if (isGrounded && !wasGrounded)
         {
-            audioSource.PlayOneShot(landSfx);
+            // 计算坠落速度（取垂直速度和最后撞击速度中的较小值的负数）
+            float fallSpeed = -Mathf.Min(characterVelocity.y, latestImpactSpeed.y);
+
+            // 计算坠落伤害比例
+            // fallSpeedRatio为0表示未达到最小伤害速度，1表示达到最大伤害速度
+            float fallSpeedRatio = (fallSpeed - minSpeedForFallDamage) / (maxSpeedForFallDamage - minSpeedForFallDamage);
+
+            // 如果开启了坠落伤害且坠落速度超过最小伤害速度
+            if (RecievesFallDamage && fallSpeedRatio > 0f)
+            {
+                // 根据坠落速度比例计算实际伤害值
+                float dmgFromFall = Mathf.Lerp(fallDamageAtMinSpeed, fallDamageAtMaxSpeed, fallSpeedRatio);
+                // 播放受伤音效
+                audioSource.PlayOneShot(fallDamageSfx);
+            }
+            else
+            {
+                // 如果没有受伤，播放普通落地音效
+                audioSource.PlayOneShot(landSfx);
+            }
         }
+
+        UpdateCharacterHeight(false);
+        // 更新角色移动
+        CharacterMovement();
     }
 
     /// <summary>
@@ -122,12 +166,6 @@ public class PlayerCtl : MonoBehaviour
                 }
             }
         }
-
-        // 如果这一帧刚刚落地，播放落地音效
-        if (!wasGrounded && isGrounded)
-        {
-            audioSource.PlayOneShot(landSfx);
-        }
     }
 
     /// <summary>
@@ -141,6 +179,34 @@ public class PlayerCtl : MonoBehaviour
         // characterController.slopeLimit是角色控制器中设置的最大可行走斜率
         // 如果斜面与地面的夹角小于等于最大可行走斜率，则返回true
         return Vector3.Angle(transform.up, normal) <= characterController.slopeLimit;
+    }
+
+    // 更新角色胶囊体高度和相机位置
+    void UpdateCharacterHeight(bool force)
+    {
+        // 立即更新高度（强制模式）
+        if (force)
+        {
+            // 直接设置角色控制器的高度为目标高度
+            characterController.height = _targetCharacterHeight;
+            // 更新胶囊体中心点位置（位于高度的一半处）
+            characterController.center = Vector3.up * characterController.height * 0.5f;
+            // 根据相机高度比例更新相机位置
+            playerCamera.transform.localPosition = Vector3.up * _targetCharacterHeight * cameraHeightRatio;
+            //m_Actor.AimPoint.transform.localPosition = characterController.center;
+        }
+        // 平滑更新高度（非强制模式）
+        else if (characterController.height != _targetCharacterHeight)
+        {
+            // 使用Lerp平滑过渡调整胶囊体大小和相机位置
+            characterController.height = Mathf.Lerp(characterController.height, _targetCharacterHeight, crouchingSharpness * Time.deltaTime);
+            // 更新胶囊体中心点
+            characterController.center = Vector3.up * characterController.height * 0.5f;
+            // 平滑过渡更新相机位置
+            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition,
+                Vector3.up * _targetCharacterHeight * cameraHeightRatio, crouchingSharpness * Time.deltaTime);
+            //m_Actor.AimPoint.transform.localPosition = characterController.center;
+        }
     }
 
     void CharacterMovement()
@@ -157,52 +223,93 @@ public class PlayerCtl : MonoBehaviour
             playerCamera.transform.localEulerAngles = new Vector3(_cameraVerticalAngle, 0, 0);
         }
 
-        Vector3 worldspaceMoveInput = transform.TransformVector(playerInput.GetMoveInput());
-        bool isRuning = false;
-        float speedModifier = isRuning ? runSpeedModifier : 1f;
-        if (isGrounded)
+        // 定义角色是否处于奔跑状态
+        bool isRuning = playerInput.GetSprintInputHeld();
         {
-            Vector3 targetVelocity = worldspaceMoveInput * maxSpeedOnGround * speedModifier;
-            characterVelocity = Vector3.Lerp(characterVelocity, targetVelocity, MovementSharpnessOnGround * Time.deltaTime);
-
-            if (playerInput.GetJumpInputDown())
+            if (isRuning)
             {
-                if (SetCrouchingState(false, false))
+                isRuning = SetCrouchingState(false, false);
+            }
+            // 根据是否奔跑设置速度修正值
+            float speedModifier = isRuning ? runSpeedModifier : 1f;
+            Vector3 worldspaceMoveInput = transform.TransformVector(playerInput.GetMoveInput());
+            // 如果角色在地面上
+            if (isGrounded)
+            {
+                // 计算目标速度：基于输入方向、基础速度和速度修正值
+                Vector3 targetVelocity = worldspaceMoveInput * maxSpeedOnGround * speedModifier;
+                // 如果处于蹲伏状态，降低移动速度
+                if (isCrouching)
+                    targetVelocity *= maxSpeedCrouchedRatio;
+                // 根据斜面重新调整移动方向
+                targetVelocity = GetDirectionReorientedOnSlope(targetVelocity.normalized, _groundNormal) * targetVelocity.magnitude;
+                // 平滑插值过渡到目标速度
+                characterVelocity = Vector3.Lerp(characterVelocity, targetVelocity, MovementSharpnessOnGround * Time.deltaTime);
+                // 处理跳跃输入
+                if (isGrounded && playerInput.GetJumpInputDown())
                 {
-                    characterVelocity = new Vector3(characterVelocity.x, 0f, characterVelocity.z);
-                    characterVelocity += Vector3.up * jumpForce;
-                    audioSource.PlayOneShot(jumpSfx);
-                    lastTimeJumped = Time.time;
-                    isGrounded = false;
+                    // 尝试从蹲伏状态站起来（如果处于蹲伏状态）
+                    if (SetCrouchingState(false, false))
+                    {
+                        // 重置垂直速度
+                        characterVelocity = new Vector3(characterVelocity.x, 0f, characterVelocity.z);
+                        // 添加向上的跳跃力
+                        characterVelocity += Vector3.up * jumpForce;
+                        // 播放跳跃音效
+                        audioSource.PlayOneShot(jumpSfx);
+                        // 记录最后跳跃时间
+                        lastTimeJumped = Time.time;
+                        HasJumpedThisFrame = true;
+                        // 设置为非接地状态
+                        isGrounded = false;
+                        _groundNormal = Vector3.up;
+                    }
                 }
-            }
 
-            //脚步的声音
-            float chosenFootstepSfxFrequency = (isRuning ? footstepSfxFrequencyWhileSprinting : FootstepSfxFrequency);
-            if (footstepDistanceCounter >= 1f / chosenFootstepSfxFrequency)
+                //脚步的声音
+                float chosenFootstepSfxFrequency = (isRuning ? footstepSfxFrequencyWhileSprinting : footstepSfxFrequency);
+                if (footstepDistanceCounter >= 1f / chosenFootstepSfxFrequency)
+                {
+                    footstepDistanceCounter = 0f;
+                    audioSource.PlayOneShot(FootstepSfx);
+                }
+
+                // 记录移动距离用于脚步声音
+                footstepDistanceCounter += characterVelocity.magnitude * Time.deltaTime;
+            }
+            else
             {
-                footstepDistanceCounter = 0f;
-                audioSource.PlayOneShot(FootstepSfx);
+                // 在空中时添加加速度
+                characterVelocity += worldspaceMoveInput * accelerationSpeedInAir * Time.deltaTime;
+
+                // 限制空中速度到最大值，但只限制水平方向
+                float verticalVelocity = characterVelocity.y;
+                Vector3 horizontalVelocity = Vector3.ProjectOnPlane(characterVelocity, Vector3.up);
+                horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, maxSpeedInAir * speedModifier);
+                characterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
+
+                // 给速度施加重力
+                characterVelocity += Vector3.down * gravityDownForce * Time.deltaTime;
             }
-
-            // 记录移动距离用于脚步声音
-            footstepDistanceCounter += characterVelocity.magnitude * Time.deltaTime;
         }
-        else
-        {
-            // 在空中时添加加速度
-            characterVelocity += worldspaceMoveInput * accelerationSpeedInAir * Time.deltaTime;
-
-            // 限制空中速度到最大值，但只限制水平方向
-            float verticalVelocity = characterVelocity.y;
-            Vector3 horizontalVelocity = Vector3.ProjectOnPlane(characterVelocity, Vector3.up);
-            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, maxSpeedInAir * speedModifier);
-            characterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
-
-            // 给速度施加重力
-            characterVelocity += Vector3.down * gravityDownForce * Time.deltaTime;
-        }
+        // 获取移动前胶囊体底部和顶部的位置
+        Vector3 capsuleBottomBeforeMove = GetCapsuleBottomHemisphere();
+        Vector3 capsuleTopBeforeMove = GetCapsuleTopHemisphere(characterController.height);
         characterController.Move(characterVelocity * Time.deltaTime);
+
+        // 检测障碍物并相应调整速度
+        latestImpactSpeed = Vector3.zero;
+        // 使用胶囊体投射检测前方障碍物
+        if (Physics.CapsuleCast(capsuleBottomBeforeMove, capsuleTopBeforeMove, characterController.radius,
+            characterVelocity.normalized, out RaycastHit hit, characterVelocity.magnitude * Time.deltaTime, -1,
+            QueryTriggerInteraction.Ignore))
+        {
+            // 记录碰撞时的速度，用于计算坠落伤害
+            latestImpactSpeed = characterVelocity;
+
+            // 根据碰撞面的法线方向调整角色速度（使角色沿着碰撞面滑动）
+            characterVelocity = Vector3.ProjectOnPlane(characterVelocity, hit.normal);
+        }
     }
 
     public void InitWeapon()
@@ -239,7 +346,7 @@ public class PlayerCtl : MonoBehaviour
         // 如果是蹲下状态，直接将目标高度设置为蹲伏高度
         if (crouched)
         {
-            targetCharacterHeight = capsuleHeightCrouching;
+            _targetCharacterHeight = capsuleHeightCrouching;
         }
         else
         {
@@ -266,7 +373,7 @@ public class PlayerCtl : MonoBehaviour
             }
 
             // 检测通过或忽略障碍物检测，将目标高度设置为站立高度
-            targetCharacterHeight = capsuleHeightStanding;
+            _targetCharacterHeight = capsuleHeightStanding;
         }
 
         // 更新接地状态，蹲下时为true，站立时为false
@@ -284,5 +391,12 @@ public class PlayerCtl : MonoBehaviour
     Vector3 GetCapsuleTopHemisphere(float atHeight)
     {
         return transform.position + (transform.up * (atHeight - characterController.radius));
+    }
+
+    //获取一个与给定斜率相切的重定向方向
+    public Vector3 GetDirectionReorientedOnSlope(Vector3 direction, Vector3 slopeNormal)
+    {
+        Vector3 directionRight = Vector3.Cross(direction, transform.up);
+        return Vector3.Cross(slopeNormal, directionRight).normalized;
     }
 }
