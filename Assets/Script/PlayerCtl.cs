@@ -26,17 +26,20 @@ public class PlayerCtl : MonoBehaviour
     [Tooltip("蹲着时的移动速度")][Range(0, 1)] public float maxSpeedCrouchedRatio = 0.5f;
     [Header("地面检测距离")] public float groundCheckDistance = 0.05f;
     [Header("检测地面的层数")] public LayerMask groundCheckLayers = -1;
-    [Header("奔跑时声音频率")] public float footstepSfxFrequencyWhileSprinting = 1f;
-    [Header("移动时声音频率")] public float footstepSfxFrequency = 1f;
+    [Header("移动时声音频率")] public float footstepSfxFrequency = 0.2f;
+    [Header("奔跑时声音频率")] public float footstepSfxFrequencyWhileSprinting = 0.3f;
     [Header("掉落受伤最大速度")] public float minSpeedForFallDamage = 10f;
     [Header("掉落受伤最大速度")] public float maxSpeedForFallDamage = 30f;
     [Header("掉落最小伤害")] public float fallDamageAtMinSpeed = 10F;
     [Header("掉落最大伤害")] public float fallDamageAtMaxSpeed = 50f;
     [Header("玩家是否会承受掉落伤害")] public bool RecievesFallDamage;
-    [Header("Stance")]
-    [Tooltip("摄像机所在的字符高度的比率（0-1）")] public float cameraHeightRatio = 0.9f;
+    [Header("摄像机所在的字符高度的比率")][Range(0, 1)] public float cameraHeightRatio = 0.9f;
+    [Header("武器摆动系数")] public float BobSharpness = 10f;
+    [Tooltip("武器不瞄准时的摆动")] public float DefaultBobAmount = 0.05f;
+    [Header("武器瞄准时的摆动")] public float AimingBobAmount = 0.02f;
+    [Header("武器摆动频率")] public float BobFrequency = 10f;
     CharacterController characterController;        //角色控制器
-    Camera playerCamera;
+    Camera playerCamera;                            //主相机
     PlayerWeaponsManager weaponsManager;
     AudioSource audioSource;
     Transform transFirstPersonSocket;
@@ -45,17 +48,22 @@ public class PlayerCtl : MonoBehaviour
     PlayerInput playerInput;                        //按键输入
     public bool isGrounded { get; private set; }    //是否在地面上
     public bool HasJumpedThisFrame { get; private set; }
-    public bool isCrouching { get; private set; }
+    public bool isCrouching { get; private set; }   //是否蹲伏
     public Vector3 characterVelocity { get; set; }  //角色速度
-    public float rotationMultiplier { get { if (WeaponMgr.Ins.isAiming) { return 1f; } return 1f; } }//旋转系数
-    float _targetCharacterHeight;                    //角色高度
+    public float rotationMultiplier { get { if (WeaponMgr.Ins.IsAiming) { return 1f; } return 1f; } }//旋转系数
+    float _targetCharacterHeight;                   //角色高度
     float _cameraVerticalAngle = 0;                 //相机垂直角度
     float lastTimeJumped = 0;                       //上次跳跃时间
+    Vector3 lastCharacterPosition;                  //上次人物位置
     const float k_JumpGroundingPreventionTime = 0.2f;//跳跃后防止立即检测地面的时间
     const float k_GroundCheckDistanceInAir = 0.07f; //空中地面检测距离
     Vector3 _groundNormal;                          //地面法线
     float footstepDistanceCounter;                  //移动距离
     Vector3 latestImpactSpeed;
+    float m_WeaponBobFactor;                        //武器摆动系数
+    bool IsAiming;                                  //是否瞄准
+    Vector3 m_WeaponMainLocalPosition;              //武器位置
+    Vector3 m_WeaponBobLocalPosition;               //武器摆动位置
 
     void Start()
     {
@@ -119,6 +127,16 @@ public class PlayerCtl : MonoBehaviour
         CharacterMovement();
     }
 
+    void LateUpdate()
+    {
+        //UpdateWeaponAiming();
+        UpdateWeaponBob();
+        Vector3 _WeaponRecoilLocalPosition = currWeaponCtl.UpdateWeaponRecoil();
+        //UpdateWeaponSwitching();
+
+        transWeaponParentSocket.localPosition = m_WeaponMainLocalPosition + m_WeaponBobLocalPosition + _WeaponRecoilLocalPosition;
+    }
+
     /// <summary>
     /// 检测角色是否接触地面，并处理接地相关的逻辑
     /// </summary>
@@ -127,14 +145,11 @@ public class PlayerCtl : MonoBehaviour
         // 根据角色是否在地面上选择不同的检测距离
         // 在地面上时：使用角色控制器的皮肤宽度加上地面检测距离
         // 在空中时：使用固定的空中检测距离
-        float chosengroundCheckDistance =
-            isGrounded ? (characterController.skinWidth + groundCheckDistance) : k_GroundCheckDistanceInAir;
-
-        // 保存上一帧的地面状态
-        bool wasGrounded = isGrounded;
+        float chosengroundCheckDistance = isGrounded ? (characterController.skinWidth + groundCheckDistance) : k_GroundCheckDistanceInAir;
 
         // 重置地面检测状态
         isGrounded = false;
+        _groundNormal = Vector3.up;
 
         // 检查是否已经过了防止连跳的时间（k_JumpGroundingPreventionTime）
         // 这个时间用来防止玩家在跳跃后立即被检测为落地
@@ -329,10 +344,11 @@ public class PlayerCtl : MonoBehaviour
         currWeaponCtl.transform.localRotation = Quaternion.identity;
         currWeaponCtl.setWeaponConfig(_gunConfig);
 
-        //// Set owner to this gameObject so the weapon can alter projectile/damage logic accordingly
-        //weaponCtl.Owner = gameObject;
-        //weaponCtl.SourcePrefab = weaponCtl.gameObject;
-        //weaponCtl.ShowWeapon(true);
+        WeaponMgr.Ins.EquipWeapon(currWeaponCtl);
+
+        //currWeaponCtl.Owner = gameObject;
+        //currWeaponCtl.SourcePrefab = weaponCtl.gameObject;
+        //currWeaponCtl.ShowWeapon(true);
     }
 
     /// <summary>
@@ -376,8 +392,8 @@ public class PlayerCtl : MonoBehaviour
             _targetCharacterHeight = capsuleHeightStanding;
         }
 
-        // 更新接地状态，蹲下时为true，站立时为false
-        isGrounded = crouched;
+        // 更新蹲伏状态，蹲下时为true，站立时为false
+        isCrouching = crouched;
         return true;
     }
 
@@ -398,5 +414,41 @@ public class PlayerCtl : MonoBehaviour
     {
         Vector3 directionRight = Vector3.Cross(direction, transform.up);
         return Vector3.Cross(slopeNormal, directionRight).normalized;
+    }
+
+    // 更新武器摆动动画效果
+    void UpdateWeaponBob()
+    {
+        if (Time.deltaTime > 0f)
+        {
+            // 计算角色的实际移动速度（位置变化/时间）
+            Vector3 playerCharacterVelocity = (characterController.transform.position - lastCharacterPosition) / Time.deltaTime;
+
+            // 计算角色移动因子（用于调整摆动幅度）
+            float characterMovementFactor = 0f;
+            if (isGrounded)
+            {
+                // 将移动速度标准化到0-1之间（相对于最大移动速度）
+                characterMovementFactor = Mathf.Clamp01(playerCharacterVelocity.magnitude / (maxSpeedOnGround * runSpeedModifier));
+            }
+
+            // 平滑过渡武器摆动系数
+            m_WeaponBobFactor = Mathf.Lerp(m_WeaponBobFactor, characterMovementFactor, BobSharpness * Time.deltaTime);
+
+            // 根据是否瞄准选择摆动幅度
+            float bobAmount = IsAiming ? AimingBobAmount : DefaultBobAmount;
+            float frequency = BobFrequency;
+            // 计算水平摆动值（使用正弦函数）
+            float hBobValue = Mathf.Sin(Time.time * frequency) * bobAmount * m_WeaponBobFactor;
+            // 计算垂直摆动值（使用正弦函数，频率是水平的2倍，并确保始终为正值）
+            float vBobValue = ((Mathf.Sin(Time.time * frequency * 2f) * 0.5f) + 0.5f) * bobAmount * m_WeaponBobFactor;
+
+            // 更新武器的摆动位置
+            m_WeaponBobLocalPosition.x = hBobValue;
+            m_WeaponBobLocalPosition.y = Mathf.Abs(vBobValue);
+
+            // 记录当前位置，用于下一帧计算速度
+            lastCharacterPosition = characterController.transform.position;
+        }
     }
 }

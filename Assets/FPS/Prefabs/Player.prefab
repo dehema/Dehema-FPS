@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &806887368
 Transform:
   m_ObjectHideFlags: 0
@@ -298,8 +298,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6717119209339842490}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.27, y: -0.3, z: 0.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -365,7 +365,7 @@ Transform:
   m_GameObject: {fileID: 7247205726325752422}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6, y: -0.46500003, z: 0.073}
+  m_LocalPosition: {x: 0.18, y: 0, z: -0.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -643,9 +643,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf3acfa5c3faae24ba706de97a016ce8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gravityDownForce: 20
+  FootstepSfx: {fileID: 0}
+  jumpSfx: {fileID: 0}
+  landSfx: {fileID: 0}
+  fallDamageSfx: {fileID: 0}
   maxSpeedOnGround: 10
   runSpeedModifier: 2
   MovementSharpnessOnGround: 15
+  jumpForce: 9
+  accelerationSpeedInAir: 25
+  maxSpeedInAir: 10
+  capsuleHeightStanding: 1.8
+  capsuleHeightCrouching: 0.9
+  crouchingSharpness: 10
+  maxSpeedCrouchedRatio: 0.5
+  groundCheckDistance: 0.05
+  groundCheckLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  footstepSfxFrequencyWhileSprinting: 1
+  footstepSfxFrequency: 1
+  minSpeedForFallDamage: 10
+  maxSpeedForFallDamage: 30
+  fallDamageAtMinSpeed: 10
+  fallDamageAtMaxSpeed: 50
+  RecievesFallDamage: 0
+  cameraHeightRatio: 0.9
+  BobSharpness: 10
+  DefaultBobAmount: 0.05
+  AimingBobAmount: 0.02
+  BobFrequency: 10
 --- !u!114 &3881028491275228844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -658,6 +686,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee14b8a7ad06264b9a2daace9b52de7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isAiming: 0
 --- !u!114 &9018831644695078780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -670,6 +699,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cac7861cda475946b077cedfb3436b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LookSensitivity: 1
+  InvertXAxis: 0
+  InvertYAxis: 0
 --- !u!1 &7383874627095517793
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,6 +965,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 806887368}
     m_Modifications:
+    - target: {fileID: 6530784527232116, guid: 7468cd18030a0204ab08baf7ac36ff1e, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6226484437272429138, guid: 7468cd18030a0204ab08baf7ac36ff1e, type: 3}
       propertyPath: m_RootOrder
       value: 0
