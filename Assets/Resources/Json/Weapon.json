@@ -3,11 +3,11 @@
     "AK12": {
       "weaponName": "AK12",
       "bulletPrefab": "BulletBlue",
-      "shootingMode": 0,
-      "delayBetweenShots": 0.2,
-      "bulletSpreadAngle": 5,
-      "bulletsPerShot": 8,
-      "damagePerBullet": 8,
+      "shootingMode": 2,
+      "delayBetweenShots": 0.1,
+      "bulletSpreadAngle": 1,
+      "bulletsPerShot": 1,
+      "damagePerBullet": 33,
       "recoilForce": 1,
       "aimZoomRatio": 0.7,
       "ammoReloadRate": 1,
@@ -19,7 +19,7 @@
     "M4A1": {
       "weaponName": "M4A1",
       "bulletPrefab": "BulletBlue",
-      "shootingMode": 0,
+      "shootingMode": 2,
       "delayBetweenShots": 0.2,
       "bulletSpreadAngle": 5,
       "bulletsPerShot": 8,
@@ -35,7 +35,7 @@
     "Scar": {
       "weaponName": "Scar",
       "bulletPrefab": "BulletBlue",
-      "shootingMode": 0,
+      "shootingMode": 2,
       "delayBetweenShots": 0.2,
       "bulletSpreadAngle": 5,
       "bulletsPerShot": 8,
@@ -51,7 +51,7 @@
     "SG552": {
       "weaponName": "SG552",
       "bulletPrefab": "BulletBlue",
-      "shootingMode": 0,
+      "shootingMode": 2,
       "delayBetweenShots": 0.2,
       "bulletSpreadAngle": 5,
       "bulletsPerShot": 8,
@@ -67,7 +67,7 @@
     "M870": {
       "weaponName": "M870",
       "bulletPrefab": "BulletBlue",
-      "shootingMode": 0,
+      "shootingMode": 2,
       "delayBetweenShots": 0.2,
       "bulletSpreadAngle": 5,
       "bulletsPerShot": 8,

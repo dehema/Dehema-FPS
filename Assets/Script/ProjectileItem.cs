@@ -69,16 +69,29 @@ public class ProjectileItem : BulletBase
     // 触发器交互设置
     const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
-    void OnEnable()
+    private void Awake()
     {
+        //gameObject.SetActive(false);
+        //Invoke("show", 0.2f);
+
         // 获取并检查必要组件
         m_ProjectileBase = GetComponent<BulletBase>();
         DebugUtility.HandleErrorIfNullGetComponent<BulletBase, ProjectileItem>(m_ProjectileBase, this, gameObject);
 
         m_ProjectileBase.OnShoot += OnShoot;
-
         // 设置子弹的生命周期
         Destroy(gameObject, MaxLifeTime);
+    }
+
+    void show()
+    {
+        gameObject.SetActive(true);
+    }
+
+
+    void OnEnable()
+    {
+
     }
 
     new void OnShoot()

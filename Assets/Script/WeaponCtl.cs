@@ -1,15 +1,9 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class WeaponCtl : MonoBehaviour
 {
-    public enum WeaponShootType
-    {
-        Manual,
-        Automatic,
-        Charge,
-    }
     [Header("武器节点")] Transform weaponRoot;
     [Header("子弹节点")] Transform bulletRoot;
     [Header("射击音频")] AudioClip ShootSfx;
@@ -29,15 +23,10 @@ public class WeaponCtl : MonoBehaviour
     float lastTimeShot;                 //上次射击时间
     public GameObject Owner { get; set; }
     public float CurrentAmmoRatio { get; private set; }         //瞄准倍率
-    Vector3 m_WeaponRecoilLocalPosition;                        //武器后坐力在本地坐标系中的位置偏移
-    Vector3 m_AccumulatedRecoil;                                //累积的后坐力向量，用于计算武器射击时的后坐力效果
-    public float CurrentCharge { get; private set; }            //当前充能值，用于充能类武器（如激光枪）
     public Vector3 MuzzleWorldVelocity { get; private set; }    //枪口的世界空间速度，用于计算子弹初始速度
     AudioSource m_ShootAudioSource;        //射击音效的音频源组件
     public UnityAction OnShoot;            //射击事件，在射击时触发
     public event Action OnShootProcessed;  //射击处理完成事件，在射击相关处理完成后触发
-    Vector3 m_WeaponMainLocalPosition;
-    Vector3 m_WeaponBobLocalPosition;
 
 
     void Awake()
@@ -45,12 +34,6 @@ public class WeaponCtl : MonoBehaviour
         m_ShootAudioSource = GetComponent<AudioSource>();
         weaponRoot = transform.Find("WeaponRoot");
         bulletRoot = transform.Find("BulletRoot");
-    }
-
-    void LateUpdate()
-    {
-        UpdateWeaponRecoil();
-        PlayerCtl.Ins.transWeaponParentSocket.localPosition = m_WeaponMainLocalPosition + m_WeaponBobLocalPosition + m_WeaponRecoilLocalPosition;
     }
 
     public void setWeaponConfig(WeaponItemConfig _weaponItemConfig)
@@ -71,14 +54,14 @@ public class WeaponCtl : MonoBehaviour
         _wantsToShoot = inputDown || inputHeld;
         switch ((WeaponShootType)weaponConfig.shootingMode)
         {
-            case WeaponShootType.Manual:
+            case WeaponShootType.Single:
                 if (inputDown)
                 {
                     return TryShoot();
                 }
                 return false;
 
-            case WeaponShootType.Automatic:
+            case WeaponShootType.Auto:
                 if (inputHeld)
                 {
                     return TryShoot();
@@ -155,26 +138,6 @@ public class WeaponCtl : MonoBehaviour
         // 使用球形插值(Slerp)在forward方向和随机单位球内方向之间进行插值，实现扩散效果
         Vector3 spreadWorldDirection = Vector3.Slerp(shootTransform.forward, UnityEngine.Random.insideUnitSphere, spreadAngleRatio);
         return spreadWorldDirection;
-    }
-
-    /// <summary>
-    /// 枪械后坐力位置
-    /// </summary>
-    /// <returns></returns>
-    public Vector3 UpdateWeaponRecoil()
-    {
-        // 后坐力距离太远就向前拉近
-        if (m_WeaponRecoilLocalPosition.z >= m_AccumulatedRecoil.z * 0.99f)
-        {
-            m_WeaponRecoilLocalPosition = Vector3.Lerp(m_WeaponRecoilLocalPosition, m_AccumulatedRecoil, RecoilSharpness * Time.deltaTime);
-        }
-        // 移动后坐位置，使其恢复到初始位置
-        else
-        {
-            m_WeaponRecoilLocalPosition = Vector3.Lerp(m_WeaponRecoilLocalPosition, Vector3.zero, RecoilRestitutionSharpness * Time.deltaTime);
-            m_AccumulatedRecoil = m_WeaponRecoilLocalPosition;
-        }
-        return m_WeaponRecoilLocalPosition;
     }
 
     //开始换弹动作
