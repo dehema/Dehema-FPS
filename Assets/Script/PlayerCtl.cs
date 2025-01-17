@@ -5,6 +5,7 @@ using Unity.FPS.Gameplay;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Audio;
+using static UnityEngine.UI.GridLayoutGroup;
 
 [RequireComponent(typeof(PlayerInput), typeof(WeaponMgr), typeof(CharacterController))]
 public class PlayerCtl : MonoBehaviour
@@ -43,7 +44,7 @@ public class PlayerCtl : MonoBehaviour
     PlayerWeaponsManager weaponsManager;
     AudioSource audioSource;
     Transform transFirstPersonSocket;
-    Transform transWeaponParentSocket;
+    public Transform transWeaponParentSocket;
     WeaponCtl currWeaponCtl;                        //当前装备的武器
     PlayerInput playerInput;                        //按键输入
     public bool isGrounded { get; private set; }    //是否在地面上
@@ -65,8 +66,11 @@ public class PlayerCtl : MonoBehaviour
     Vector3 m_WeaponMainLocalPosition;              //武器位置
     Vector3 m_WeaponBobLocalPosition;               //武器摆动位置
 
-    void Start()
+    public static PlayerCtl Ins;
+
+    private void Awake()
     {
+        Ins = this;
         playerCamera = Camera.main;
         audioSource = GetComponent<AudioSource>();
         playerInput = GetComponent<PlayerInput>();
@@ -77,8 +81,11 @@ public class PlayerCtl : MonoBehaviour
         FootstepSfx = Resources.Load<AudioClip>("Audio/Sound/Footstep");
         jumpSfx = Resources.Load<AudioClip>("Audio/Sound/Jump");
         landSfx = Resources.Load<AudioClip>("Audio/Sound/Land");
-        InitWeapon();
+    }
 
+    void Start()
+    {
+        InitWeapon();
         characterController.enableOverlapRecovery = true;
         SetCrouchingState(false, true);
         UpdateCharacterHeight(true);
@@ -343,6 +350,7 @@ public class PlayerCtl : MonoBehaviour
         currWeaponCtl.transform.localPosition = Vector3.zero;
         currWeaponCtl.transform.localRotation = Quaternion.identity;
         currWeaponCtl.setWeaponConfig(_gunConfig);
+        currWeaponCtl.Owner = gameObject;
 
         WeaponMgr.Ins.EquipWeapon(currWeaponCtl);
 

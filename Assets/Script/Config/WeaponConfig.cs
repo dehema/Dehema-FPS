@@ -25,9 +25,9 @@ public enum WeaponType
 //枪械配置
 public class GunItemConfig : WeaponItemConfig
 {
-    public string weaponName;       //武器名称								
+    public string weaponName;       //武器名称
     public string bulletPrefab;     //子弹模型
-    public string shootingMode;     //射击模式
+    public int shootingMode;        //射击模式
     public float delayBetweenShots; //射击间隔
     public float bulletSpreadAngle; //子弹散布   
     public int bulletsPerShot;      //弹丸数量/每发
@@ -37,6 +37,8 @@ public class GunItemConfig : WeaponItemConfig
     public float ammoReloadRate;    //每秒装填的弹药数量
     public float ammoReloadDelay;   //装弹延迟
     public int maxAmmo;             //每个弹夹弹药量
+    public string bulletFlashPrefab;//枪口火焰模型
+    public string projectilesPrefab;//弹道模型
 
     public bool isEmpty()
     {

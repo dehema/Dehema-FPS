@@ -11,6 +11,7 @@ public class WeaponMgr : MonoBehaviour
     }
     [Header("正在瞄准")] public bool IsAiming = false;
     [Header("武器后座最大距离")] public float MaxRecoilDistance;
+    [Header("武器相机")] public Camera WeaponCamera;
 
     const string weaponSpritePath = "Sprite/Weapon/";
     PlayerInput playerInput;
@@ -23,6 +24,7 @@ public class WeaponMgr : MonoBehaviour
     {
         Ins = this;
         playerInput = GetComponent<PlayerInput>();
+        WeaponCamera = transform.Find("Main Camera/WeaponCamera").GetComponent<Camera>();
     }
 
     void Update()
