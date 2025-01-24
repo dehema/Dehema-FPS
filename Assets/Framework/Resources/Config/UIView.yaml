@@ -112,4 +112,12 @@ view:
         comment: 游戏调试界面
         layer: PopUI
         bgColor: "#000000B0"
+    LootView:
+        comment: 战利品界面
+        layer: PopUI
+        bgColor: "#000000B0"
+    BagView:
+        comment: 背包界面
+        layer: PopUI
+        bgColor: "#000000B0"
 
