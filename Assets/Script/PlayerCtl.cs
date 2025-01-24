@@ -35,6 +35,9 @@ public class PlayerCtl : MonoBehaviour
     [Header("掉落最大伤害")] public float fallDamageAtMaxSpeed = 50f;
     [Header("玩家是否会承受掉落伤害")] public bool RecievesFallDamage;
     [Header("摄像机所在的字符高度的比率")][Range(0, 1)] public float cameraHeightRatio = 0.9f;
+    [Header("检测可交互物体的距离")] public float interactionRange = 2f;
+    [Header("检测可交互物体的层级")] public LayerMask interactionLayer = -1;
+
     CharacterController characterController;        //角色控制器
     Camera playerCamera;                            //主相机
     PlayerWeaponsManager weaponsManager;
@@ -126,6 +129,9 @@ public class PlayerCtl : MonoBehaviour
         UpdateCharacterHeight(false);
         // 更新角色移动
         CharacterMovement();
+
+        // 检测可交互物体
+        CheckInteractable();
     }
 
     /// <summary>
@@ -156,7 +162,7 @@ public class PlayerCtl : MonoBehaviour
 
                 // 检查两个条件：
                 // 1. 地面法线与角色向上方向的点积大于0（确保不是在天花板上）
-                // 2. 地面斜率在可行走范围内
+                // 2. 地面斜度在可行走范围内
                 if (Vector3.Dot(hit.normal, transform.up) > 0f &&
                     IsNormalUnderSlopeLimit(_groundNormal))
                 {
@@ -406,5 +412,28 @@ public class PlayerCtl : MonoBehaviour
     {
         Vector3 directionRight = Vector3.Cross(direction, transform.up);
         return Vector3.Cross(slopeNormal, directionRight).normalized;
+    }
+
+    /// <summary>
+    /// 检测玩家面前的可交互物体
+    /// </summary>
+    /// <remarks>
+    /// 使用射线检测玩家面前的可交互物体：
+    /// - 从摄像机发射射线
+    /// - 检测指定层级的碰撞体
+    /// - 如果检测到LootBox且按下E键，则触发交互
+    /// </remarks>
+    private void CheckInteractable()
+    {
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, interactionRange, interactionLayer))
+        {
+            // 尝试获取LootBox组件
+            LootBox lootBox = hit.collider.GetComponent<LootBox>();
+            if (lootBox != null && !lootBox.IsLooted && Input.GetKeyDown(KeyCode.E))
+            {
+                // 触发箱子的搜索功能
+                lootBox.TryOpenBox();
+            }
+        }
     }
 }
