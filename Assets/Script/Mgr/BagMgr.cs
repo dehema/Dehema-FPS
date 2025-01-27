@@ -14,14 +14,14 @@ public class BagMgr : Singleton<BagMgr>
         /// <summary>
         /// 物品配置
         /// </summary>
-        public LootConfig config;
+        public ItemConfig config;
 
         /// <summary>
         /// 物品数量
         /// </summary>
         public int count;
 
-        public BagSlot(LootConfig config, int count = 1)
+        public BagSlot(ItemConfig config, int count = 1)
         {
             this.config = config;
             this.count = count;
@@ -46,15 +46,15 @@ public class BagMgr : Singleton<BagMgr>
     /// <param name="config">物品配置</param>
     /// <param name="count">数量</param>
     /// <returns>是否添加成功</returns>
-    public bool AddItem(LootConfig config, int count = 1)
+    public bool AddItem(ItemConfig config, int count = 1)
     {
         if (config == null || count <= 0)
             return false;
 
         // 如果已经有这个物品，尝试堆叠
-        if (bagItems.ContainsKey(config.lootID))
+        if (bagItems.ContainsKey(config.id))
         {
-            bagItems[config.lootID].count += count;
+            bagItems[config.id].count += count;
             OnBagChanged();
             return true;
         }
@@ -64,7 +64,7 @@ public class BagMgr : Singleton<BagMgr>
             return false;
 
         // 添加新物品
-        bagItems.Add(config.lootID, new BagSlot(config, count));
+        bagItems.Add(config.id, new BagSlot(config, count));
         OnBagChanged();
         return true;
     }

@@ -83,7 +83,7 @@ public class WeaponMgr : MonoBehaviour
     //获取武器图标
     public Sprite GetWeaponIcon(string _weaponName)
     {
-        return Resources.Load<Sprite>("Sprite/Weapon/" + _weaponName);
+        return Resources.Load<Sprite>("Icon/Weapon/" + _weaponName);
     }
 
     //获取武器预制体

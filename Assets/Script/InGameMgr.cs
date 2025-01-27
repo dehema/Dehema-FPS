@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class InGameMgr : MonoSingleton<InGameMgr>
 {
-    
-    public bool isGameEnding;  //游戏是否结束
 
+    public bool isGameEnding;  //游戏是否结束
 
     /// <summary>
     /// 获取品质颜色

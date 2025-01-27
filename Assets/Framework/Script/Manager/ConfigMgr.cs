@@ -17,6 +17,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
     public WorldConfig worldConfig;
     public AllFactionConfig factionConfig;
     public WeaponConfig weaponConfig;
+    public AllItemConfig allItemConfig;
 
     public void Init()
     {
@@ -31,6 +32,7 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
         worldConfig = LoadConfig<WorldConfig>("World");
         factionConfig = LoadConfig<AllFactionConfig>("Faction");
         weaponConfig = LoadConfig<WeaponConfig>("Weapon");
+        allItemConfig = LoadConfig<AllItemConfig>("Item");
         AllLoadComplete();
     }
 
@@ -108,5 +110,14 @@ public class ConfigMgr : MonoSingleton<ConfigMgr>
     public FactionConfig GetFactionConfig(int _factionID)
     {
         return factionConfig.faction[_factionID];
+    }
+
+    /// <summary>
+    /// 获取派系配置
+    /// </summary>
+    /// <returns></returns>
+    public ItemConfig GetItemConfig(string _itemID)
+    {
+        return allItemConfig.items[_itemID];
     }
 }
