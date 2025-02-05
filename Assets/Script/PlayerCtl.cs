@@ -429,10 +429,20 @@ public class PlayerCtl : MonoBehaviour
         {
             // 尝试获取LootBox组件
             LootBox lootBox = hit.collider.GetComponent<LootBox>();
-            if (lootBox != null && !lootBox.IsLooted && Input.GetKeyDown(KeyCode.E))
+            if (lootBox != null && Input.GetKeyDown(KeyCode.E))
             {
                 // 触发箱子的搜索功能
-                lootBox.TryOpenBox();
+                if (!lootBox.IsLooted)
+                {
+                    Timer.Ins.SetTimeOut(() =>
+                    {
+                        if (!UIMgr.Ins.IsShow<LootView>())
+                            InGameUIController.Ins.ToggleView<LootView>();
+                    }, 0.3f);
+                    lootBox.TryOpenBox();
+                }
+                else
+                    InGameUIController.Ins.ToggleView<LootView>();
             }
         }
     }

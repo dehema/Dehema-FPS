@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InGameUIController : MonoBehaviour
+public class InGameUIController : MonoSingleton<InGameUIController>
 {
     void Start()
     {
@@ -22,7 +22,7 @@ public class InGameUIController : MonoBehaviour
     /// <summary>
     /// 切换指定界面的显示/隐藏，同时隐藏其他界面
     /// </summary>
-    void ToggleView<T>() where T : BaseView
+    public void ToggleView<T>() where T : BaseView
     {
         bool isViewVisible = UIMgr.Ins.IsShow<T>();
 
@@ -31,6 +31,8 @@ public class InGameUIController : MonoBehaviour
             UIMgr.Ins.CloseView<GameDebugView>();
         if (UIMgr.Ins.IsShow<BagView>())
             UIMgr.Ins.CloseView<BagView>();
+        if (UIMgr.Ins.IsShow<LootView>())
+            UIMgr.Ins.CloseView<LootView>();
 
         // 如果目标界面原本是隐藏的，就显示它
         if (!isViewVisible)

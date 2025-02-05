@@ -15,6 +15,10 @@ public partial class BagView : BaseView
     public GameObject content;
     [HideInInspector]
     public RectTransform content_Rect;
+    [HideInInspector]
+    public GameObject floatItemIcon;
+    [HideInInspector]
+    public Image floatItemIcon_Image;
 
     internal override void _LoadUI()    
     {
@@ -24,5 +28,7 @@ public partial class BagView : BaseView
         bg_Button = bg.GetComponent<Button>();
         content = transform.Find("$content#Rect").gameObject;
         content_Rect = content.GetComponent<RectTransform>();
+        floatItemIcon = transform.Find("$content#Rect/bg/$floatItemIcon#Image").gameObject;
+        floatItemIcon_Image = floatItemIcon.GetComponent<Image>();
     }
 }

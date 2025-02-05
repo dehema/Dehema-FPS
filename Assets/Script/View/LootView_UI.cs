@@ -15,6 +15,14 @@ public partial class LootView : BaseView
     public GameObject content;
     [HideInInspector]
     public RectTransform content_Rect;
+    [HideInInspector]
+    public GameObject bag;
+    [HideInInspector]
+    public ItemContainer bag_ItemContainer;
+    [HideInInspector]
+    public GameObject loot;
+    [HideInInspector]
+    public ItemContainer loot_ItemContainer;
 
     internal override void _LoadUI()    
     {
@@ -24,5 +32,9 @@ public partial class LootView : BaseView
         bg_Button = bg.GetComponent<Button>();
         content = transform.Find("$content#Rect").gameObject;
         content_Rect = content.GetComponent<RectTransform>();
+        bag = transform.Find("$content#Rect/bg/ItemContainerScroll_1/Viewport/Content/$bag#ItemContainer").gameObject;
+        bag_ItemContainer = bag.GetComponent<ItemContainer>();
+        loot = transform.Find("$content#Rect/bg/ItemContainerScroll/Viewport/Content/$loot#ItemContainer").gameObject;
+        loot_ItemContainer = loot.GetComponent<ItemContainer>();
     }
 }

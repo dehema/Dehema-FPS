@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static LootBox;
 
-[RequireComponent(typeof(GridLayoutGroup))]
 /// <summary>
 /// 物品容器系统
 /// 基于网格的物品存放系统，支持物品旋转和嵌套存储
@@ -18,13 +19,12 @@ public partial class ItemContainer : BaseUI
     private List<ItemSlotData> items = new List<ItemSlotData>();  // 容器中的所有物品
     private bool[,] occupiedCells;                        // 记录每个格子是否被占用
     private ItemSlot[,] slots;                           // 所有格子的引用
-    private GridLayoutGroup gridLayout;                   // 网格布局组件
 
     void Awake()
     {
+        _LoadUI();
         occupiedCells = new bool[gridSize.x, gridSize.y];
         slots = new ItemSlot[gridSize.x, gridSize.y];
-        gridLayout = GetComponent<GridLayoutGroup>();
         InitializeGrid();
         UpdateContainerSize();
     }
@@ -40,15 +40,15 @@ public partial class ItemContainer : BaseUI
     private void InitializeGrid()
     {
         // 设置网格布局参数
-        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        gridLayout.constraintCount = gridSize.x;
+        grid_GridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid_GridLayoutGroup.constraintCount = gridSize.x;
 
         // 生成所有格子
         for (int y = 0; y < gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                ItemSlot slot = Instantiate(slotPrefab, transform);
+                ItemSlot slot = Instantiate(slotPrefab, grid.transform);
                 slots[x, y] = slot;
                 // 可以设置格子的位置信息或其他属性
                 slot.name = $"Slot_{x}_{y}";
@@ -121,6 +121,8 @@ public partial class ItemContainer : BaseUI
             slots[topLeft.x, topLeft.y].setItemConfig(item, count);
         }
 
+
+
         return true;
     }
 
@@ -191,14 +193,12 @@ public partial class ItemContainer : BaseUI
     /// </summary>
     public void UpdateContainerSize()
     {
-        if (gridLayout == null) return;
-
         RectTransform rectTransform = GetComponent<RectTransform>();
         if (rectTransform == null) return;
 
         // 计算总宽度和高度
-        float totalWidth = gridSize.x * gridLayout.cellSize.x + (gridSize.x - 1) * gridLayout.spacing.x;
-        float totalHeight = gridSize.y * gridLayout.cellSize.y + (gridSize.y - 1) * gridLayout.spacing.y;
+        float totalWidth = gridSize.x * grid_GridLayoutGroup.cellSize.x + (gridSize.x - 1) * grid_GridLayoutGroup.spacing.x;
+        float totalHeight = gridSize.y * grid_GridLayoutGroup.cellSize.y + (gridSize.y - 1) * grid_GridLayoutGroup.spacing.y;
 
         // 设置RectTransform的尺寸
         rectTransform.sizeDelta = new Vector2(totalWidth, totalHeight);
@@ -314,5 +314,136 @@ public partial class ItemContainer : BaseUI
         {
             RefreshDisplay();
         }
+    }
+
+    /// <summary>
+    /// 获取指定格子的位置
+    /// </summary>
+    public Vector2Int GetSlotPosition(ItemSlot slot)
+    {
+        for (int y = 0; y < gridSize.y; y++)
+        {
+            for (int x = 0; x < gridSize.x; x++)
+            {
+                if (slots[x, y] == slot)
+                {
+                    return new Vector2Int(x, y);
+                }
+            }
+        }
+        return new Vector2Int(-1, -1);
+    }
+
+    /// <summary>
+    /// 获取鼠标位置的格子
+    /// </summary>
+    public Vector2Int GetMouseSlotPosition()
+    {
+        // 获取鼠标位置
+        Vector2 mousePos = Input.mousePosition;
+
+        // 获取容器的RectTransform
+        RectTransform containerRect = GetComponent<RectTransform>();
+
+        // 将鼠标屏幕坐标转换为容器的本地坐标
+        Vector2 localPoint;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, mousePos, null, out localPoint);
+
+        // 获取网格布局的参数
+        Vector2 cellSize = grid_GridLayoutGroup.cellSize;
+        Vector2 spacing = grid_GridLayoutGroup.spacing;
+
+        // 计算格子位置
+        int x = Mathf.FloorToInt((localPoint.x + containerRect.rect.width / 2) / (cellSize.x + spacing.x));
+        int y = Mathf.FloorToInt((-localPoint.y + containerRect.rect.height / 2) / (cellSize.y + spacing.y));
+
+        // 确保位置在有效范围内
+        if (x >= 0 && x < gridSize.x && y >= 0 && y < gridSize.y)
+        {
+            return new Vector2Int(x, y);
+        }
+
+        return new Vector2Int(-1, -1);
+    }
+
+    /// <summary>
+    /// 检查是否可以接受物品
+    /// </summary>
+    public bool CanAcceptItem(ItemConfig item, Vector2Int position)
+    {
+        if (item == null) return false;
+        return CanPlaceItem(position, item.size) || (allowRotation && CanPlaceItem(position, new Vector2Int(item.size.y, item.size.x)));
+    }
+
+    /// <summary>
+    /// 交换两个位置的物品
+    /// </summary>
+    public void SwapItems(Vector2Int sourcePos, Vector2Int targetPos)
+    {
+        if (sourcePos == targetPos) return;
+
+        ItemSlotData sourceItem = GetItemAt(sourcePos);
+        ItemSlotData targetItem = GetItemAt(targetPos);
+
+        if (sourceItem == null) return;
+
+        // 如果目标位置为空
+        if (targetItem == null)
+        {
+            // 检查新位置是否可以放置源物品
+            if (CanPlaceItem(targetPos, sourceItem.item.size, sourceItem.isRotated))
+            {
+                // 移除原位置的物品
+                RemoveItemAt(sourcePos);
+                // 在新位置放置物品
+                TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
+            }
+        }
+        // 如果目标位置有物品
+        else
+        {
+            // 临时移除两个位置的物品
+            RemoveItemAt(sourcePos);
+            RemoveItemAt(targetPos);
+
+            bool success = true;
+
+            // 尝试在目标位置放置源物品
+            if (!TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count))
+            {
+                success = false;
+            }
+
+            // 尝试在源位置放置目标物品
+            if (!TryPlaceItem(targetItem.item, sourcePos, targetItem.item.size, targetItem.isRotated, targetItem.count))
+            {
+                success = false;
+                // 如果放置失败，恢复原位置的源物品
+                TryPlaceItem(sourceItem.item, sourcePos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
+            }
+
+            // 如果交换失败，恢复原状
+            if (!success)
+            {
+                if (GetItemAt(targetPos) != null)
+                {
+                    RemoveItemAt(targetPos);
+                }
+                TryPlaceItem(targetItem.item, targetPos, targetItem.item.size, targetItem.isRotated, targetItem.count);
+            }
+        }
+
+        RefreshDisplay();
+    }
+
+    public void ShowFloatItem(ItemConfig _itemConfig)
+    {
+        //floatItem_ItemSlot.setItemConfig(_itemConfig);
+        //floatItem.SetActive(true);
+    }
+
+    public void HideFloatItem()
+    {
+        //floatItem.SetActive(false);
     }
 }

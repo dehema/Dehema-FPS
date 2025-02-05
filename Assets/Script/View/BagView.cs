@@ -6,8 +6,15 @@ public partial class BagView : BaseView
 {
     [SerializeField] ItemContainer bagContainer;
 
-    private void Start()
+    public override void Init(params object[] _params)
     {
+        base.Init(_params);
+        floatItemIcon.SetActive(false);
+    }
+
+    public override void OnOpen(params object[] _params)
+    {
+        base.OnOpen(_params);
         if (bagContainer.GetAllItems().Count == 0)
         {
             bagContainer.AddItem("1");
