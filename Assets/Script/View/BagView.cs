@@ -9,7 +9,10 @@ public partial class BagView : BaseView
     public override void Init(params object[] _params)
     {
         base.Init(_params);
-        floatItemIcon.SetActive(false);
+
+        floatItemIcon_FloatItemIcon.gameObject.SetActive(false);
+        bagContainer.SetShowFloatItemDelegate(floatItemIcon_FloatItemIcon.OnShowFloatItem);
+        bagContainer.SetHideFloatItemDelegate(floatItemIcon_FloatItemIcon.OnHideFloatItem);
     }
 
     public override void OnOpen(params object[] _params)

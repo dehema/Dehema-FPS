@@ -16,13 +16,16 @@ public partial class ItemContainer : BaseUI
 
     [Header("格子预制体")] public ItemSlot slotPrefab;
 
-    private List<ItemSlotData> items = new List<ItemSlotData>();  // 容器中的所有物品
-    private bool[,] occupiedCells;                        // 记录每个格子是否被占用
-    private ItemSlot[,] slots;                           // 所有格子的引用
+    private List<ItemSlotData> items = new List<ItemSlotData>();    // 容器中的所有物品
+    private bool[,] occupiedCells;                                  // 记录每个格子是否被占用
+    private ItemSlot[,] slots;                                      // 所有格子的引用
+    private FloatItemIcon.ShowFloatItemDelegate showFloatItemDelegate;  // 显示浮动物品的委托
+    private FloatItemIcon.HideFloatItemDelegate hideFloatItemDelegate;  // 隐藏浮动物品的委托
 
     void Awake()
     {
         _LoadUI();
+
         occupiedCells = new bool[gridSize.x, gridSize.y];
         slots = new ItemSlot[gridSize.x, gridSize.y];
         InitializeGrid();
@@ -438,12 +441,29 @@ public partial class ItemContainer : BaseUI
 
     public void ShowFloatItem(ItemConfig _itemConfig)
     {
-        //floatItem_ItemSlot.setItemConfig(_itemConfig);
-        //floatItem.SetActive(true);
+        showFloatItemDelegate(_itemConfig);
     }
 
     public void HideFloatItem()
     {
-        //floatItem.SetActive(false);
+        hideFloatItemDelegate();
+    }
+
+    /// <summary>
+    /// 设置显示浮动物品的委托
+    /// </summary>
+    /// <param name="delegate">FloatItemIcon的委托</param>
+    public void SetShowFloatItemDelegate(FloatItemIcon.ShowFloatItemDelegate @delegate)
+    {
+        showFloatItemDelegate = @delegate;
+    }
+
+    /// <summary>
+    /// 设置显示浮动物品的委托
+    /// </summary>
+    /// <param name="delegate">FloatItemIcon的委托</param>
+    public void SetHideFloatItemDelegate(FloatItemIcon.HideFloatItemDelegate @delegate)
+    {
+        hideFloatItemDelegate = @delegate;
     }
 }

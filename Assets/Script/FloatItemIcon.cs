@@ -4,11 +4,20 @@ using UnityEngine.UI;
 
 public class FloatItemIcon : MonoBehaviour
 {
+    // å®šä¹‰å§”æ‰˜
+    public delegate void ShowFloatItemDelegate(ItemConfig itemConfig);
+    public ShowFloatItemDelegate OnShowFloatItem;
+    public delegate void HideFloatItemDelegate();
+    public HideFloatItemDelegate OnHideFloatItem;
+
     Image icon;
 
-    void Start()
+    void Awake()
     {
         icon = GetComponent<Image>();
+        // åˆå§‹åŒ–å§”æ‰˜
+        OnShowFloatItem = ShowFloatItem;
+        OnHideFloatItem = HideFloatItem;
     }
 
     void Update()
@@ -16,14 +25,13 @@ public class FloatItemIcon : MonoBehaviour
         transform.position = Input.mousePosition;
     }
 
-    void ShowFloatItem(ItemConfig _itemConfig)
+    public void ShowFloatItem(ItemConfig _itemConfig)
     {
         icon.sprite = Resources.Load<Sprite>("Icon/" + _itemConfig.icon);
         gameObject.SetActive(true);
-        ĞèÒª¶ÔÕâÁ½¸öÈí¼ş½øĞĞ·â×°
     }
 
-    void HideFloatItem()
+    public void HideFloatItem()
     {
         gameObject.SetActive(false);
     }

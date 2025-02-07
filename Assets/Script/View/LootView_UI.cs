@@ -23,6 +23,10 @@ public partial class LootView : BaseView
     public GameObject loot;
     [HideInInspector]
     public ItemContainer loot_ItemContainer;
+    [HideInInspector]
+    public GameObject floatItemIcon;
+    [HideInInspector]
+    public FloatItemIcon floatItemIcon_FloatItemIcon;
 
     internal override void _LoadUI()    
     {
@@ -32,9 +36,11 @@ public partial class LootView : BaseView
         bg_Button = bg.GetComponent<Button>();
         content = transform.Find("$content#Rect").gameObject;
         content_Rect = content.GetComponent<RectTransform>();
-        bag = transform.Find("$content#Rect/bg/ItemContainerScroll_1/Viewport/Content/$bag#ItemContainer").gameObject;
+        bag = transform.Find("$content#Rect/bg/bagContainerScroll/Viewport/Content/$bag#ItemContainer").gameObject;
         bag_ItemContainer = bag.GetComponent<ItemContainer>();
-        loot = transform.Find("$content#Rect/bg/ItemContainerScroll/Viewport/Content/$loot#ItemContainer").gameObject;
+        loot = transform.Find("$content#Rect/bg/lootContainerScroll/Viewport/Content/$loot#ItemContainer").gameObject;
         loot_ItemContainer = loot.GetComponent<ItemContainer>();
+        floatItemIcon = transform.Find("$content#Rect/bg/$floatItemIcon#FloatItemIcon").gameObject;
+        floatItemIcon_FloatItemIcon = floatItemIcon.GetComponent<FloatItemIcon>();
     }
 }

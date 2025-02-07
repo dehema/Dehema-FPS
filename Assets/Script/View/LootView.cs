@@ -4,6 +4,17 @@ using UnityEngine;
 
 public partial class LootView : BaseView
 {
+    public override void Init(params object[] _params)
+    {
+        base.Init(_params);
+
+        floatItemIcon_FloatItemIcon.gameObject.SetActive(false);
+        bag_ItemContainer.SetShowFloatItemDelegate(floatItemIcon_FloatItemIcon.OnShowFloatItem);
+        bag_ItemContainer.SetHideFloatItemDelegate(floatItemIcon_FloatItemIcon.OnHideFloatItem);
+        loot_ItemContainer.SetShowFloatItemDelegate(floatItemIcon_FloatItemIcon.OnShowFloatItem);
+        loot_ItemContainer.SetHideFloatItemDelegate(floatItemIcon_FloatItemIcon.OnHideFloatItem);
+    }
+
     public override void OnOpen(params object[] _params)
     {
         base.OnOpen(_params);
