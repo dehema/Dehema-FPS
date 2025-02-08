@@ -1,8 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InGameUIController : MonoSingleton<InGameUIController>
+public class InGameUIController : MonoBehaviour
 {
+    public static InGameUIController Ins;
+
+    private void Awake()
+    {
+        Ins = this;
+    }
     void Start()
     {
     }

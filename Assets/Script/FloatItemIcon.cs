@@ -20,6 +20,11 @@ public class FloatItemIcon : MonoBehaviour
         OnHideFloatItem = HideFloatItem;
     }
 
+    private void OnEnable()
+    {
+        transform.position = Input.mousePosition;
+    }
+
     void Update()
     {
         transform.position = Input.mousePosition;

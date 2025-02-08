@@ -3,13 +3,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public partial class ItemSlot : BaseUI, IPointerDownHandler
+public partial class ItemSlot : BaseUI, IPointerDownHandler, IPointerUpHandler
 {
     private ItemConfig itemConfig;
     private int count = 1;
     private Canvas canvas;
     private ItemContainer container;
-    public static ItemSlot draggingSlot;
+    public static ItemSlot startDraggingSlot;
+    public static ItemSlot endDraggingSlot;
+    public Vector2Int slotPos;
+
+    public ItemConfig GetItemConfig() => itemConfig;
+    public int GetCount() => count;
+    public ItemSlot GetMouseItemSlot() => container.GetMouseItemSlot();
 
     private void Awake()
     {
@@ -21,59 +27,34 @@ public partial class ItemSlot : BaseUI, IPointerDownHandler
     private void Update()
     {
         // 如果当前格子是被拖拽的格子
-        if (draggingSlot == this && itemConfig != null)
+        if (startDraggingSlot == this && itemConfig != null)
         {
             // 检测鼠标按键状态
             if (Input.GetMouseButton(0)) // 鼠标左键按住
             {
                 // 更新浮动物品的位置
-                Vector2Int mousePos = GetMouseSlotPosition();
                 // 可以在这里添加预览效果
             }
             else // 鼠标左键释放
             {
-                Vector2Int targetPos = GetMouseSlotPosition();
-                if (targetPos.x != -1 && targetPos.y != -1)
+                endDraggingSlot = GetMouseItemSlot();
+                if (endDraggingSlot != null)
                 {
                     // 如果是同一个容器内的交换
-                    if (draggingSlot.container == container)
+                    if (startDraggingSlot.container == endDraggingSlot.container)
                     {
-                        container.SwapItems(draggingSlot.GetGridPosition(), targetPos);
+                        container.SwapItems(startDraggingSlot, endDraggingSlot);
                     }
                     // 如果是不同容器之间的交换
                     else
                     {
-                        // 原有的跨容器交换逻辑
-                        ItemContainer sourceContainer = draggingSlot.container;
-                        Vector2Int sourcePos = draggingSlot.GetGridPosition();
-
-                        if (container.CanAcceptItem(draggingSlot.GetItemConfig(), targetPos))
-                        {
-                            ItemSlotData sourceItem = sourceContainer.RemoveItemAt(sourcePos);
-                            if (itemConfig == null)
-                            {
-                                container.TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
-                            }
-                            else
-                            {
-                                ItemSlotData targetItem = container.RemoveItemAt(targetPos);
-                                if (!container.TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count))
-                                {
-                                    container.TryPlaceItem(targetItem.item, targetPos, targetItem.item.size, targetItem.isRotated, targetItem.count);
-                                    sourceContainer.TryPlaceItem(sourceItem.item, sourcePos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
-                                }
-                                else if (!sourceContainer.TryPlaceItem(targetItem.item, sourcePos, targetItem.item.size, targetItem.isRotated, targetItem.count))
-                                {
-                                    sourceContainer.TryPlaceItem(sourceItem.item, sourcePos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
-                                    container.TryPlaceItem(targetItem.item, targetPos, targetItem.item.size, targetItem.isRotated, targetItem.count);
-                                }
-                            }
-                        }
+                        endDraggingSlot.container.SwapItems(startDraggingSlot, endDraggingSlot);
                     }
                 }
 
                 container.HideFloatItem();
-                draggingSlot = null;
+                startDraggingSlot = null;
+                endDraggingSlot = null;
             }
         }
     }
@@ -84,11 +65,6 @@ public partial class ItemSlot : BaseUI, IPointerDownHandler
         count = _count;
         ShowIcon();
     }
-
-    public ItemConfig GetItemConfig() => itemConfig;
-    public int GetCount() => count;
-    public Vector2Int GetGridPosition() => container.GetSlotPosition(this);
-    public Vector2Int GetMouseSlotPosition() => container.GetMouseSlotPosition();
 
     public void ShowIcon()
     {
@@ -139,24 +115,36 @@ public partial class ItemSlot : BaseUI, IPointerDownHandler
     {
         if (itemConfig == null) return;
 
-        draggingSlot = this;
+        startDraggingSlot = this;
 
         // 将拖拽的物品移到最上层
         //transform.SetParent(canvas.transform);
         container.ShowFloatItem(itemConfig);
     }
 
-    public void OnDrag(PointerEventData eventData) { }
-
-    public void OnEndDrag(PointerEventData eventData) { }
-
-    public void OnDrop(PointerEventData eventData) { }
-
     public void OnPointerDown(PointerEventData eventData)
     {
         if (itemConfig == null)
             return;
-        draggingSlot = this;
+        startDraggingSlot = this;
         container.ShowFloatItem(itemConfig);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        var results = new System.Collections.Generic.List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (var result in results)
+        {
+            // 尝试获取点击位置的ItemSlot组件
+            ItemSlot targetSlot = result.gameObject.GetComponent<ItemSlot>();
+            if (targetSlot != null)
+            {
+                endDraggingSlot = targetSlot;
+                return;
+            }
+        }
+        endDraggingSlot = null;
     }
 }

@@ -1,11 +1,7 @@
 using System;
 using System.Linq;
-using Unity.FPS.Game;
 using Unity.FPS.Gameplay;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Audio;
-using static UnityEngine.UI.GridLayoutGroup;
 
 [RequireComponent(typeof(PlayerInput), typeof(WeaponMgr), typeof(CharacterController))]
 public class PlayerCtl : MonoBehaviour

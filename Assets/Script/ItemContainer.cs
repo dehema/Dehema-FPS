@@ -13,7 +13,6 @@ public partial class ItemContainer : BaseUI
     [Header("容器设置")] public Vector2Int gridSize = new Vector2Int(8, 8);
     [Header("是否允许物品旋转")] public bool allowRotation = true;
     [Header("是否允许物品嵌套")] public bool allowNesting = false;
-
     [Header("格子预制体")] public ItemSlot slotPrefab;
 
     private List<ItemSlotData> items = new List<ItemSlotData>();    // 容器中的所有物品
@@ -21,6 +20,7 @@ public partial class ItemContainer : BaseUI
     private ItemSlot[,] slots;                                      // 所有格子的引用
     private FloatItemIcon.ShowFloatItemDelegate showFloatItemDelegate;  // 显示浮动物品的委托
     private FloatItemIcon.HideFloatItemDelegate hideFloatItemDelegate;  // 隐藏浮动物品的委托
+    private List<ItemSlot> itemSlotlibrary = new List<ItemSlot>();      //栏位库
 
     void Awake()
     {
@@ -35,6 +35,12 @@ public partial class ItemContainer : BaseUI
     private void OnEnable()
     {
         RefreshDisplay();
+        AddItemSlotLibrary(this);
+    }
+
+    private void OnDisable()
+    {
+        ClearItemSlotLibrary();
     }
 
     /// <summary>
@@ -53,7 +59,8 @@ public partial class ItemContainer : BaseUI
             {
                 ItemSlot slot = Instantiate(slotPrefab, grid.transform);
                 slots[x, y] = slot;
-                // 可以设置格子的位置信息或其他属性
+                // 设置格子的位置信息
+                slot.slotPos = new Vector2Int(x, y);
                 slot.name = $"Slot_{x}_{y}";
             }
         }
@@ -379,64 +386,24 @@ public partial class ItemContainer : BaseUI
     }
 
     /// <summary>
-    /// 交换两个位置的物品
+    /// 交换两个格子的物品
     /// </summary>
-    public void SwapItems(Vector2Int sourcePos, Vector2Int targetPos)
+    public void SwapItems(ItemSlot slot1, ItemSlot slot2)
     {
-        if (sourcePos == targetPos) return;
+        if (slot1 == null || slot2 == null) return;
 
-        ItemSlotData sourceItem = GetItemAt(sourcePos);
-        ItemSlotData targetItem = GetItemAt(targetPos);
+        // 获取两个格子的物品配置和数量
+        ItemConfig item1 = slot1.GetItemConfig();
+        int count1 = slot1.GetCount();
+        ItemConfig item2 = slot2.GetItemConfig();
+        int count2 = slot2.GetCount();
 
-        if (sourceItem == null) return;
+        // 交换物品
+        slot1.setItemConfig(item2, count2);
+        slot2.setItemConfig(item1, count1);
 
-        // 如果目标位置为空
-        if (targetItem == null)
-        {
-            // 检查新位置是否可以放置源物品
-            if (CanPlaceItem(targetPos, sourceItem.item.size, sourceItem.isRotated))
-            {
-                // 移除原位置的物品
-                RemoveItemAt(sourcePos);
-                // 在新位置放置物品
-                TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
-            }
-        }
-        // 如果目标位置有物品
-        else
-        {
-            // 临时移除两个位置的物品
-            RemoveItemAt(sourcePos);
-            RemoveItemAt(targetPos);
-
-            bool success = true;
-
-            // 尝试在目标位置放置源物品
-            if (!TryPlaceItem(sourceItem.item, targetPos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count))
-            {
-                success = false;
-            }
-
-            // 尝试在源位置放置目标物品
-            if (!TryPlaceItem(targetItem.item, sourcePos, targetItem.item.size, targetItem.isRotated, targetItem.count))
-            {
-                success = false;
-                // 如果放置失败，恢复原位置的源物品
-                TryPlaceItem(sourceItem.item, sourcePos, sourceItem.item.size, sourceItem.isRotated, sourceItem.count);
-            }
-
-            // 如果交换失败，恢复原状
-            if (!success)
-            {
-                if (GetItemAt(targetPos) != null)
-                {
-                    RemoveItemAt(targetPos);
-                }
-                TryPlaceItem(targetItem.item, targetPos, targetItem.item.size, targetItem.isRotated, targetItem.count);
-            }
-        }
-
-        RefreshDisplay();
+        // 刷新显示
+        //RefreshDisplay();
     }
 
     public void ShowFloatItem(ItemConfig _itemConfig)
@@ -465,5 +432,54 @@ public partial class ItemContainer : BaseUI
     public void SetHideFloatItemDelegate(FloatItemIcon.HideFloatItemDelegate @delegate)
     {
         hideFloatItemDelegate = @delegate;
+    }
+
+    public List<ItemSlot> GetItemSlotLibrary()
+    {
+        return itemSlotlibrary;
+    }
+
+    public void ClearItemSlotLibrary()
+    {
+        itemSlotlibrary.Clear();
+    }
+
+    public void AddItemSlotLibrary(ItemContainer _itemContainer)
+    {
+        // 遍历slots数组，将所有ItemSlot添加到library中
+        for (int x = 0; x < _itemContainer.gridSize.x; x++)
+        {
+            for (int y = 0; y < _itemContainer.gridSize.y; y++)
+            {
+                ItemSlot slot = _itemContainer.slots[x, y];
+                if (slot != null && !itemSlotlibrary.Contains(slot))
+                {
+                    itemSlotlibrary.Add(slot);
+                }
+            }
+        }
+    }
+
+    public ItemSlot GetMouseItemSlot()
+    {
+        Vector2 mousePos = Input.mousePosition;
+
+        foreach (var slot in itemSlotlibrary)
+        {
+            RectTransform rectTransform = slot.GetComponent<RectTransform>();
+            Vector2 slotPos = rectTransform.position;
+            Vector2 slotSize = rectTransform.sizeDelta;
+
+            // 检查鼠标是否在这个格子的范围内
+            if (mousePos.x >= slotPos.x - slotSize.x / 2 &&
+                mousePos.x <= slotPos.x + slotSize.x / 2 &&
+                mousePos.y >= slotPos.y - slotSize.y / 2 &&
+                mousePos.y <= slotPos.y + slotSize.y / 2)
+            {
+                return slot;
+            }
+        }
+
+        return null;
     }
 }

@@ -18,7 +18,8 @@ public partial class LootView : BaseView
     public override void OnOpen(params object[] _params)
     {
         base.OnOpen(_params);
-
+        bag_ItemContainer.AddItemSlotLibrary(loot_ItemContainer);
+        loot_ItemContainer.AddItemSlotLibrary(bag_ItemContainer);
         if (loot_ItemContainer.GetAllItems().Count == 0)
         {
             loot_ItemContainer.AddItem("11");
