@@ -11,6 +11,7 @@ public class InGameUIController : MonoBehaviour
     }
     void Start()
     {
+        UIMgr.Ins.OpenView<HUDView>();
     }
 
     void Update()

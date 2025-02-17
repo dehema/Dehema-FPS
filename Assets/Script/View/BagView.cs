@@ -13,6 +13,10 @@ public partial class BagView : BaseView
         floatItemIcon_FloatItemIcon.gameObject.SetActive(false);
         bagContainer.SetShowFloatItemDelegate(floatItemIcon_FloatItemIcon.OnShowFloatItem);
         bagContainer.SetHideFloatItemDelegate(floatItemIcon_FloatItemIcon.OnHideFloatItem);
+        hp_Slider.onValueChanged.AddListener((float hp) =>
+        {
+            UIMgr.Ins.GetView<HUDView>().Health = (int)hp;
+        });
     }
 
     public override void OnOpen(params object[] _params)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public partial class BagView : BaseView
 {
@@ -19,6 +20,10 @@ public partial class BagView : BaseView
     public GameObject floatItemIcon;
     [HideInInspector]
     public FloatItemIcon floatItemIcon_FloatItemIcon;
+    [HideInInspector]
+    public GameObject hp;
+    [HideInInspector]
+    public Slider hp_Slider;
 
     internal override void _LoadUI()    
     {
@@ -30,5 +35,7 @@ public partial class BagView : BaseView
         content_Rect = content.GetComponent<RectTransform>();
         floatItemIcon = transform.Find("$content#Rect/bg/$floatItemIcon#FloatItemIcon").gameObject;
         floatItemIcon_FloatItemIcon = floatItemIcon.GetComponent<FloatItemIcon>();
+        hp = transform.Find("$content#Rect/bg/Hp/$hp#Slider").gameObject;
+        hp_Slider = hp.GetComponent<Slider>();
     }
 }

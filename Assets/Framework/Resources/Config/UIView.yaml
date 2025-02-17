@@ -67,11 +67,6 @@ view:
         comment: 图文混合
         bgColor: "#000000B0"
         bgClose: true
-    HUDView:
-        comment: 战场计时数据
-        layer: TipsUI
-        hasBg: false
-        worldAllow: true
     RecruitView:
         comment: 招募
         layer: PopUI
@@ -120,4 +115,8 @@ view:
         comment: 背包界面
         layer: PopUI
         bgColor: "#000000B0"
+    HUDView:
+        comment: HUD
+        layer: NormalUI
+        hasBg: false
 
