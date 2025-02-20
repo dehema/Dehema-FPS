@@ -1,14 +1,12 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : BaseEnemyFSM
 {
-    void Start()
+    protected override void InitializeState()
     {
-
     }
 
-    void Update()
+    protected override void UpdateState()
     {
-
     }
 }
